@@ -1,3 +1,12 @@
+buildscript {
+    ext.kotlin_version = '1.2.71'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
 plugins {
   id "me.champeau.gradle.jmh" version "0.4.6"
 }
@@ -5,8 +14,9 @@ plugins {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'kotlin'
 
-    group = 'me.champeau.sample'
+    group = 'me.mishkun.sample'
     version = '1.0-SNAPSHOT'
 
     sourceCompatibility = 1.7
@@ -21,23 +31,30 @@ allprojects {
 apply plugin: 'me.champeau.gradle.jmh'
 
 jmh {
-    include = 'org\\.openjdk\\.jmh\\.samples\\.JMHSample_01_HelloWorld.*'
+    include = ['.*Kotlin.*']
     humanOutputFile = null
-    warmupIterations = 1
-    iterations = 1
+    warmupIterations = 10
+    iterations = 10
+    timeUnit = 'ns'
+    benchmarkMode = [ "avgt" ]
 }
 
 // it is possible to tweak the jmhJar task directly
 jmhJar.baseName = 'custom'
 
-subprojects {
-    apply plugin: 'me.champeau.gradle.jmh'
-
-    jmh {
-        include = 'org\\.openjdk\\.jmh\\.samples\\.JMHSample_01_HelloWorld.*'
-        humanOutputFile = null
-        warmupIterations = 1
-        iterations = 1
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
-
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
